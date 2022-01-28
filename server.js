@@ -34,11 +34,17 @@ app.use(morgan('dev'));
 
 app.use(express.json());
 
+app.use(express.urlencoded({ extended: true }));
+
 //Routes 
 
 const routesController = require ('./controllers/controllers.js');
 
+const userController = require ('./controllers/users');
+
 app.use('/', routesController);
+
+app.use('/users', userController);
 
 //listen for PORT
 
