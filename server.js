@@ -12,6 +12,8 @@ const mongoose = require ('mongoose');
 
 const { PORT = 4000 } = process.env;
 
+const session = require('express-session');
+
 require('dotenv').config();
 
 //DB connection
@@ -36,16 +38,27 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
+app.use(
+    session({
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: false
+    })
+)
+
 //Routes 
 
 const routesController = require ('./controllers/controllers.js');
 
 const userController = require ('./controllers/users');
 
+const sessionsController = require('./controllers/sessions');
+
 app.use('/', routesController);
 
 app.use('/users', userController);
 
+app.use('/sessions', sessionsController);
 //listen for PORT
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`))
