@@ -1,8 +1,11 @@
 {
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^14.3.2",
     "express": "^4.17.2",
+    "express-session": "^1.17.2",
+    "mongoose": "^6.1.8",
     "morgan": "^1.10.0"
   },
   "scripts": {
