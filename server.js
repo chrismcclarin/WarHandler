@@ -5,27 +5,44 @@ const express = require ('express');
 const cors = require ('cors');
 
 const morgan = require ('morgan')
-
-const app = express();
-
 const mongoose = require('mongoose');
-
-const { PORT = 4000 } = process.env;
-
 const session = require('express-session');
 
+// EXPRESS APP
+const app = express();
+
+// SERVER SETTINGS
 require('dotenv').config();
 
-//DB connection
+// EXPOSE CONFIG VARIABLES
+const { MONGODB_URL, PORT = 4000 } = process.env;
 
-mongoose.connect(process.env.DATABASE_URL);
+//MONGODB connection
+mongoose.connect(MONGODB_URL);
 
-//DB connection error/success
+//MONGODB EVENT LISTENERS
 
 const db = mongoose.connection;
-db.on('error', (err) => console.log(err.message +'Is mongodb not running?'));
-db.on('connected', () => console.log('Connected!'));
-db.on('disconnected', () => console.log('MongoDB is disconnected'));
+db
+.on('connected', () => console.log('Connected to MongoDB'))
+.on('disconnected', () => console.log('Disconnected from MongoDB'))
+.on('error', (err) => console.log('MongoDB Error: ' + err.message))
+
+// SET UP CREATE UNIT MODEL
+const unitsSchema = new mongoose.Schema({
+    Name: String,
+    Movement: String,
+    WeaponSkill: String,
+    BallisticSkill: String,
+    Strength: String,
+    Toughness: String,
+    Wounds: String,
+    Attacks: String,
+    Leadership: String,
+    Save: String,
+}, { timestamps: true });
+
+const Units = mongoose.model('Units', unitsSchema);
 
 
 // IMPORT JSON FILES
@@ -109,19 +126,49 @@ app.get('/Factions', (req, res) => {
 });
 
 
+// UNITS INDEX ROUTE
+app.get('/units', async (req, res) => {
+    try {
+        // SEND ALL UNITS
+        res.json(await Units.find({}));
+    } catch (error) {
+        res.status(400).json(error);
+    }
+});
 
 
+// UNITS CREATE ROUTE
+app.post('/units', async (req, res) => {
+    try {
+        res.json(await Units.create(req.body));
+    } catch (error) {
+        res.status(400).json(error);
+    }
+});
 
+// UNITS UPDATE ROUTE
+app.put('/units/:id', async (req, res) => {
+    try {
+        res.json(await Units.findByIdAndUpdate(req.params.id, req.body, { new: true }))
+    } catch (error) {
+        res.status(400).json(error);
+    }
+});
 
-
-
-
-
+// UNITS DELETE ROUTE
+app.delete('/units/:id', async (req, res) => {
+    try {
+        res.json(await Units.findByIdAndDelete(req.params.id));
+    } catch (error) {
+        res.status(400).json(error);
+    }
+});
 
 
 //listen for PORT
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`))
+
 
 
 
